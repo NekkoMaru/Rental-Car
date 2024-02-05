@@ -77,12 +77,7 @@
     <div class="formContainer">
         <h1>Car Rental Booking Form</h1>
         <form id="calcForm" method="post" action="http://localhost:3000">
-            <label for="pickup-location">Pickup Location:</label>
-            <input type="text" id="pickup-location" name="pickup" required>
-    
-            <label for="dropoff-location">Dropoff Location:</label>
-            <input type="text" id="dropoff-location" name="dropoff" required>
-
+            
             <label for="pickup-date">Pickup Date:</label>
             <input type="date" id="pickup-date" name="pickupdate" required>
     
@@ -91,15 +86,20 @@
 
             <label for="car-type">Car Type:</label>
             <select id="car-type" name="type">
-                <option value="compact">Compact</option>
+                <option value="Compact">Compact</option>
                 <option value="Electric">Electric</option>
-                <option value="cabrio">Cabrio</option>
-                <option value="racer">Racer</option>
+                <option value="Cabrio">Cabrio</option>
+                <option value="Racer">Racer</option>
             </select>
 
             <div class="form-group">
                 <label for="age">Diver's age</label>
                 <input type="number" class="form-control" name="age" required/>
+            </div>
+
+            <div>
+                <label for="license-date">License get date:</label>
+                <input type="date" id="license-date" name="licensedate" required>
             </div>
 
             <button type="submit" class="btn btn-primary">Search</button>
