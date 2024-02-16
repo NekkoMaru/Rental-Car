@@ -75,12 +75,11 @@ function calculateRentalPrice(age, carClass, rentalDays, rentalSeason, licenseYe
 
 
 function price(pickupDate, dropoffDate, type, age, licensedate) {
-    const carClass = getCarClass(type);
     const rentalDays = getRentalDays(pickupDate, dropoffDate);
     const rentalSeason = getRentalSeason(pickupDate, dropoffDate);
     const licenseYears = getLicenseYears(pickupDate, licensedate);
     
-    return calculateRentalPrice(age, carClass, rentalDays, rentalSeason, licenseYears);
+    return calculateRentalPrice(age, rentalDays, rentalSeason, licenseYears);
 }
 
 exports.price = price;
