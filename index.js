@@ -17,10 +17,8 @@ const resultHtml = fs.readFileSync('result.html', 'utf8');
 app.post('/', (req, res) => {
     const post = req.body;
     const result = rental.price(
-        String(post.pickup),
-        String(post.dropoff),
-        Date.parse(post.pickupdate),
-        Date.parse(post.dropoffdate),
+        Date.parse(post.pickupDate),
+        Date.parse(post.dropoffDate),
         String(post.type),
         Number(post.age),
         Date.parse(post.licensedate)

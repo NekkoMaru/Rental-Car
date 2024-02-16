@@ -1,64 +1,49 @@
-function price(pickupDate, dropoffDate, type, age, licensedate) {
-    function getCarClass(type) {
-        switch (type) {
-            case "compact":
-                return "compact";
-            case "electric":
-                return "electric";
-            case "cabrio":
-                return "cabrio";
-            case "racer":
-                return "racer";
-            default:
-                return "unknown";
-        }
+function getCarClass(type) {
+    return type;
+}
+
+
+function getRentalDays(pickupDate, dropoffDate) {
+    console.log("pickupDate:", pickupDate);
+    console.log("dropoffDate:", dropoffDate);
+    const oneDay = 24 * 60 * 60 * 1000; //hours*minutes*seconds*milliseconds
+    const firstDate = new Date(pickupDate);
+    const secondDate = new Date(dropoffDate);
+    const differenceMs = Math.abs(firstDate.getTime() - secondDate.getTime());
+    return Math.round(differenceMs / oneDay) + 1;
+}
+
+function getRentalSeason(pickupDate, dropoffDate) {
+    const pickup = new Date(pickupDate);
+    const dropoff = new Date(dropoffDate);
+
+    const start = 4; // April
+    const end = 10; // October
+
+    const pickupMonth = pickup.getMonth();
+    const dropoffMonth = dropoff.getMonth();
+
+    if (
+        (pickupMonth >= start && pickupMonth <= end) ||
+        (dropoffMonth >= start && dropoffMonth <= end) || /// Перенести на true / false 
+        (pickupMonth < start && dropoffMonth > end)
+    ) {
+        return "High";
+    } else {
+        return "Low";
     }
+}
 
-    function getRentalDays(pickupDate, dropoffDate) {
-        console.log("pickupDate:", pickupDate);
-        console.log("dropoffDate:", dropoffDate);
-        const oneDay = 24 * 60 * 60 * 1000;
-        const firstDate = new Date(pickupDate);
-        const secondDate = new Date(dropoffDate);
-        const differenceMs = Math.abs(firstDate.getTime() - secondDate.getTime());
-        return Math.round(differenceMs / oneDay) + 1;
-    }
-    
-    
+function getLicenseYears(pickupDate, licensedate) {
+    const pickup = new Date(pickupDate);
+    const licenseDate = new Date(licensedate);
+    const oneYear = 365 * 24 * 60 * 60 * 1000;
+    const licenseYears = (pickup - licenseDate) / oneYear; //days*hours*minutes*seconds*milliseconds
+    return licenseYears;
+}
 
-    function getRentalSeason(pickupDate, dropoffDate) {
-        const pickup = new Date(pickupDate);
-        const dropoff = new Date(dropoffDate);
-
-        const start = 4; // April
-        const end = 10; // October
-
-        const pickupMonth = pickup.getMonth();
-        const dropoffMonth = dropoff.getMonth();
-
-        if (
-            (pickupMonth >= start && pickupMonth <= end) ||
-            (dropoffMonth >= start && dropoffMonth <= end) ||
-            (pickupMonth < start && dropoffMonth > end)
-        ) {
-            return "High";
-        } else {
-            return "Low";
-        }
-    }
-
-    function getLicenseYears(pickupDate, licensedate) {
-        const pickup = new Date(pickupDate);
-        const licenseDate = new Date(licensedate);
-        const licenseYears = (pickup - licenseDate) / (365 * 24 * 60 * 60 * 1000); //days*hours*minutes*seconds*milliseconds
-        return licenseYears;
-    }
-
-    const carClass = getCarClass(type);
-    const rentalDays = getRentalDays(pickupDate, dropoffDate);
-    const rentalSeason = getRentalSeason(pickupDate, dropoffDate);
-    const licenseYears = getLicenseYears(pickupDate, licensedate);
-    let rentalPrice = age; // Minimum rental price per day is equivalent to the age of the driver
+function calculateRentalPrice(age, carClass, rentalDays, rentalSeason, licenseYears) {
+    let rentalPrice = age; // Minimum rental price per day  age of the driver
 
     if (age < 18) {
         return "Driver too young - cannot quote the price";
@@ -94,8 +79,16 @@ function price(pickupDate, dropoffDate, type, age, licensedate) {
 
     rentalPrice *= rentalDays; // Multiply by the number of rental days
 
-    // Use method toFixed to format the rental price
     return '$' + rentalPrice.toFixed(2);
+}
+
+function price(pickupDate, dropoffDate, type, age, licensedate) {
+    const carClass = getCarClass(type);
+    const rentalDays = getRentalDays(pickupDate, dropoffDate);
+    const rentalSeason = getRentalSeason(pickupDate, dropoffDate);
+    const licenseYears = getLicenseYears(pickupDate, licensedate);
+    
+    return calculateRentalPrice(age, carClass, rentalDays, rentalSeason, licenseYears);
 }
 
 exports.price = price;
