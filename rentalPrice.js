@@ -1,8 +1,3 @@
-function getCarClass(type) {
-    return type;
-}
-
-
 function getRentalDays(pickupDate, dropoffDate) {
     console.log("pickupDate:", pickupDate);
     console.log("dropoffDate:", dropoffDate);
@@ -17,28 +12,24 @@ function getRentalSeason(pickupDate, dropoffDate) {
     const pickup = new Date(pickupDate);
     const dropoff = new Date(dropoffDate);
 
-    const start = 4; // April
-    const end = 10; // October
+    const start = 3; // April
+    const end = 9; // October
 
     const pickupMonth = pickup.getMonth();
     const dropoffMonth = dropoff.getMonth();
 
-    if (
+    return (
         (pickupMonth >= start && pickupMonth <= end) ||
-        (dropoffMonth >= start && dropoffMonth <= end) || /// Перенести на true / false 
+        (dropoffMonth >= start && dropoffMonth <= end) || 
         (pickupMonth < start && dropoffMonth > end)
-    ) {
-        return "High";
-    } else {
-        return "Low";
-    }
+    ) 
 }
 
 function getLicenseYears(pickupDate, licensedate) {
     const pickup = new Date(pickupDate);
     const licenseDate = new Date(licensedate);
-    const oneYear = 365 * 24 * 60 * 60 * 1000;
-    const licenseYears = (pickup - licenseDate) / oneYear; //days*hours*minutes*seconds*milliseconds
+    const oneYear = 365 * 24 * 60 * 60 * 1000; //days*hours*minutes*seconds*milliseconds
+    const licenseYears = (pickup - licenseDate) / oneYear; 
     return licenseYears;
 }
 
@@ -61,19 +52,19 @@ function calculateRentalPrice(age, carClass, rentalDays, rentalSeason, licenseYe
         rentalPrice *= 1.3; // Increase price by 30%, if driver had driver license for less than 2 years
     }
 
-    if (licenseYears < 3 && rentalSeason === "High") {
+    if (licenseYears < 3 && rentalSeason) {
         rentalPrice += 15; // Add 15 euros to the daily rental price during high season and if driver had driver license for less than 3 years
     }
 
-    if (carClass === "racer" && age <= 25 && rentalSeason === "High") {
+    if (carClass === "racer" && age <= 25 && rentalSeason) {
         rentalPrice *= 1.5; // Increase price by 50% for racer car and driver aged 25 or younger during high season
     }
 
-    if (rentalSeason === "High") {
+    if (rentalSeason) {
         rentalPrice *= 1.15; // Increase price by 15% during high season
     }
 
-    if (rentalDays > 10 && rentalSeason === "Low") {
+    if (rentalDays > 10 && !rentalSeason) {
         rentalPrice *= 0.9; // Decrease price by 10% for rentals longer than 10 days during low season
     }
 
@@ -81,6 +72,7 @@ function calculateRentalPrice(age, carClass, rentalDays, rentalSeason, licenseYe
 
     return '$' + rentalPrice.toFixed(2);
 }
+
 
 function price(pickupDate, dropoffDate, type, age, licensedate) {
     const carClass = getCarClass(type);
