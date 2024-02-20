@@ -1,44 +1,48 @@
-const _ALL_CAR_CLASSES = ['compact', 'electric', 'cabrio', 'racer'];
+const _ALL_CAR_CLASSES = ['компакт', 'электрический', 'кабриолет', 'гонщик'];
+
+function carClassExists(carClass) {
+    return _ALL_CAR_CLASSES.includes(carClass);
+}
 
 function calculatePrice(pickupDate, dropoffDate, type, age, LicenseDateObtaining) {
     const licenseYears = getLicenseYears(pickupDate, LicenseDateObtaining);
-
     const rentalDays = getRentalDays(pickupDate, dropoffDate);
     const rentalSeason = getRentalSeason(pickupDate, dropoffDate);
 
-    // Rental cars are categorized into 4 classes: Compact, Electric, Cabrio, Racer.
+    // Автомобили в аренду делятся на 4 класса: Компакт, Электрический, Кабриолет, Гонщик.
     if (!carClassExists(type)) {
-        return false; // Selected car class does not exist
+        return "Выбранный класс автомобиля не существует";
     }
-
-    // The minimum rental price per day is equivalent to the age of the driver.
     let rentalPrice = age;
 
     const ageReqMet = ageReqCheck(age, type, rentalSeason, rentalPrice);
     if (typeof ageReqMet !== 'number') {
-        return false; // Age requirement not met
+        return ageReqMet; // Сообщение о невыполнении требований к возрасту
     } else {
         rentalPrice = ageReqMet;
     }
 
-    const licenseReq = licenseReqCheck(rentalDays, rentalSeason, licenseYears, rentalPrice)
+    const licenseReq = licenseReqCheck(rentalDays, rentalSeason, licenseYears, rentalPrice);
     if (typeof licenseReq !== 'number') {
-        return false; // License requirement not met
+        return licenseReq; // Сообщение о невыполнении требований к лицензии
     } else {
         rentalPrice = licenseReq;
     }
 
     rentalPrice = calculateSeasonPrice(rentalSeason, rentalDays, rentalPrice);
 
-    return rentalPrice.toFixed(2); // Returning the rental price as a string
+    const totalRentalPrice = rentalPrice * rentalDays; // Рассчитываем общую стоимость аренды на весь период
+
+    return '$' + totalRentalPrice.toFixed(2); // Возвращаем текстовое значение с форматированной ценой
 }
 
+
 function calculateSeasonPrice(rentalSeason, rentalDays, rentalPrice) {
-    // If renting in High season, price is increased by 15%.
+    // При аренде в Высокий сезон цена увеличивается на 15%.
     if (rentalSeason) {
         rentalPrice *= 1.15;
     }
-    // If renting for more than 10 days, price is decreased by 10% (except during the high season). 
+    // При аренде более чем на 10 дней цена уменьшается на 10% (кроме высокого сезона). 
     else if (rentalDays > 10) {
         rentalPrice *= 0.9;
     }
@@ -47,49 +51,48 @@ function calculateSeasonPrice(rentalSeason, rentalDays, rentalPrice) {
 }
 
 function licenseReqCheck(rentalDays, rentalSeason, licenseYears, price = 0) {
-    // Individuals holding a driver's license for less than a year are ineligible to rent.
+    // Лица, удерживающие водительские права менее года, не имеют права на аренду.
     if (licenseYears < 1) {
-        return false;
+        return "Лица, удерживающие водительские права менее года, не имеют права на аренду.";
+    } else if (rentalSeason && licenseYears < 3) {
+        price += (15 * rentalDays) + (price * 0.3); // Добавляет дополнительные расходы за каждый день аренды и 30% от текущей цены
     } else if (licenseYears < 2) {
         price *= 1.3;
-    } else if (licenseYears < 3 && rentalSeason) {
-        price += (15 * rentalDays);
     }
-
+    
     return price;
 }
 
+
+
 function ageReqCheck(age, type, rentalSeason, price) {
-    // Individuals under the age of 18 are ineligible to rent a car.
+    // Лица младше 18 лет не имеют права на аренду автомобиля.
     if (age < 18) {
-        return false;
+        return "Водитель слишком молод - невозможно предоставить цену";
     }
-    // Those aged 18-21 can only rent Compact cars.
-    else if (age <= 21 && type !== "compact") {
-        return false;
+    // Лица в возрасте от 18 до 21 года могут арендовать только Компактные автомобили.
+    else if (age <= 21 && type !== "компакт") {
+        return "Водители в возрасте до 21 года могут арендовать только Компактные автомобили";
     }
-    // For Racers, the price is increased by 50% if the driver is 25 years old or younger (except during the low season).
-    if (type === "racer" && age <= 25 && !rentalSeason) {
+    // Для Гонщиков цена увеличивается на 50%, если водитель моложе 25 лет (кроме низкого сезона).
+    if (type === "гонщик" && age <= 25 && rentalSeason) {
         price *= 1.5;
     }
     return price;
 }
 
-function carClassExists(carClass) {
-    return _ALL_CAR_CLASSES.includes(carClass);
-}
 
 function getRentalDays(pickupDate, dropoffDate) {
     const rentDate = new Date(pickupDate);
     const rentOverDate = new Date(dropoffDate);
-    const millisecondsPerDay = 24 * 60 * 60 * 1000; //hours*minutes*seconds*milliseconds
+    const millisecondsPerDay = 24 * 60 * 60 * 1000; //часы*минуты*секунды*миллисекунды
 
     return Math.round(Math.abs((rentDate - rentOverDate) / millisecondsPerDay)) + 1;
 }
 
 function getRentalSeason(pickupDate, dropoffDate) {
-    const highSeasonStart = 3; // April
-    const highSeasonEnd = 9; // October
+    const highSeasonStart = 3; // Апрель
+    const highSeasonEnd = 9; // Октябрь
 
     const rentDate = new Date(pickupDate);
     const rentOverDate = new Date(dropoffDate);
@@ -106,8 +109,8 @@ function getRentalSeason(pickupDate, dropoffDate) {
 function getLicenseYears(pickupDate, licensedate) {
     const pickup = new Date(pickupDate);
     const licenseDate = new Date(licensedate);
-    const oneYear = 365 * 24 * 60 * 60 * 1000; //days*hours*minutes*seconds*milliseconds
-    const licenseYears = (pickup - licenseDate) / oneYear; 
+    const oneYear = 365 * 24 * 60 * 60 * 1000; //дни*часы*минуты*секунды*миллисекунды
+    const licenseYears = (pickup - licenseDate) / oneYear;
     return licenseYears;
 }
 
